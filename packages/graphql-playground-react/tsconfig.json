@@ -8,7 +8,7 @@
     ],
     "sourceMap": true,
     "jsx": "preserve",
-    "rootDir": "src",
+    "allowJs": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

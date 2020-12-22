@@ -12,10 +12,15 @@ export interface Props {
   onRequestClose: (endpoint: string) => void
   endpoint: string
 }
-
+interface IMyObject {
+  value: string;
+  display:string;
+  example:string;
+}
 export interface State {
   endpoint: string
   valid?: boolean
+  arr: IMyObject[]
 }
 
 export default class EndpointPopup extends React.Component<Props, State> {
@@ -49,60 +54,73 @@ export default class EndpointPopup extends React.Component<Props, State> {
     super(props)
     this.state = {
       endpoint: props.endpoint,
+      arr: []
     }
   }
 
   componentDidMount() {
-    this.checkEndpoint()
+    fetch("http://localhost:3000/apilist")
+      .then((response) => {
+        return response.json();
+      })
+      .then(data => {
+        let apisFromDb = data.map(api => {
+          return { value: api.endpoint, display: api.name,example:api.example }
+        });
+        this.setState({
+          arr: apisFromDb
+        });
+      }).catch(error => {
+        console.log(error);
+      });
+this.checkEndpoint()
   }
 
-  render() {
-    const { valid } = this.state
-    return (
-      <Popup onRequestClose={this.close} darkBg={true}>
-        <Wrapper>
-          <LogoWrapper>
-            <Logo>
-              <img src={imageSource} alt="" />
-              <Heading>GraphQL Playground</Heading>
-            </Logo>
-          </LogoWrapper>
-          <Form action="" onSubmit={this.submit}>
-            <Input
-              type="text"
-              placeholder="Enter an endpoint url..."
-              value={this.state.endpoint}
-              onChange={this.onChangeEndpoint}
-              valid={typeof valid === 'boolean' && valid}
-              invalid={typeof valid === 'boolean' && !valid}
-              autoFocus={true}
-            />
-
-            {valid && (
-              <Button purple={true} onClick={this.close}>
-                Use Endpoint
-              </Button>
-            )}
-          </Form>
-        </Wrapper>
-      </Popup>
-    )
-  }
-
+render() {
+  const { valid } = this.state
+  return (
+    <Popup onRequestClose={this.close} darkBg={true}>
+      <Wrapper>
+        <LogoWrapper>
+          <Logo>
+            <Heading>TIBCO GraphQL API's</Heading>
+          </Logo>
+        </LogoWrapper>
+        <Form action="" onSubmit={this.submit}>
+          <select id="mySelect1" onChange={this.onChangeEndpoint} autoFocus={true} >
+          {this.state.arr.map((api) => <option key={api.value} value={api.value}>{api.display}</option>)}
+          </select>
+          {valid && (
+            <Button purple={true} onClick={this.close}>
+              TRY API
+            </Button>
+          )}
+        </Form>
+      </Wrapper>
+    </Popup>
+  )
+}
+​
   private onChangeEndpoint = e => {
-    this.setState({ endpoint: e.target.value }, this.checkEndpoint)
-  }
-
-  private submit = e => {
-    e.preventDefault()
-    this.close()
-  }
-
-  private close = () => {
-    if (this.state.valid) {
-      this.props.onRequestClose(this.state.endpoint)
+  this.setState({ endpoint: e.target.value }, this.checkEndpoint)
+  this.state.arr.map((obj) => {
+    if (obj.value==e.target.value) {
+      localStorage.setItem("example",obj.example);
+      return;
     }
+  })
+}
+​
+  private submit = e => {
+  e.preventDefault()
+  this.close()
+}
+​
+  private close = () => {
+  if (this.state.valid) {
+    this.props.onRequestClose(this.state.endpoint)
   }
+}
 }
 
 const Wrapper = styled.div`
@@ -113,12 +131,12 @@ const Form = styled.form`
   width: 100%;
   display: flex;
   flex: 1 1 auto;
-
+​
   .button.button {
     padding-right: ${p => p.theme.sizes.small16};
     padding-left: ${p => p.theme.sizes.small16};
     background: #da1b7f;
-
+​
     &:hover {
       background: ${p => p.theme.colours.purple};
     }
@@ -143,17 +161,17 @@ const Input = styled<InputProps, 'input'>('input')`
   text-align: center;
   flex: 1 1 auto;
   display: flex;
-
+​
   transition: 250ms color;
-
+​
   ${(p: any) =>
     p.valid ? css`
       color: ${k => k.theme.colours.green};
     `
-    : p.invalid ? css`
+      : p.invalid ? css`
       color: ${k => k.theme.colours.red};
     `
-    : ``
+        : ``
   }
 `
 
@@ -174,7 +192,7 @@ const Logo = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: 60px;
-
+​
   img {
     width: 78px;
     height: 78px;

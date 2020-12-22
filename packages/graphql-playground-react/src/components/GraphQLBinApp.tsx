@@ -46,13 +46,12 @@ class GraphQLBinApp extends React.Component<Props & ReduxProps, State> {
     super(props)
 
     this.state = {
-      endpoint: props.endpoint,
+      endpoint:"https://eu-west-1.integration.cloud.tibcoapps.com/hbynejrppnbf5sndc4gbtp2lopuuaze3/graphql",
       subscriptionEndpoint: props.subscriptionEndpoint,
       loading: false,
       headers: props.headers || {},
     }
   }
-
   UNSAFE_componentWillMount() {
     if (this.props.match.params.id) {
       if (this.props.match.params.id === 'new') {
@@ -111,6 +110,7 @@ class GraphQLBinApp extends React.Component<Props & ReduxProps, State> {
   }
 
   render() {
+    localStorage.setItem("example","query{<br/>GetUser(userId: 5){<br/>name<br/>email<br/>id<br/>}<br/>}");
     let { endpoint, subscriptionEndpoint } = this.state
     // If no  endpoint passed tries to get one from url
     if (!endpoint) {

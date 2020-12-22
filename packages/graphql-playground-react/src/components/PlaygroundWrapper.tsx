@@ -1,5 +1,6 @@
 import * as React from 'react'
 import Playground, { Playground as IPlayground } from './Playground'
+import Autocomplete from './Autocomplete'
 import { Helmet } from 'react-helmet'
 import { GraphQLConfig } from '../graphqlConfig'
 import * as yaml from 'js-yaml'
@@ -74,7 +75,11 @@ export interface ReduxProps {
   theme: string
   injectTabs: (tabs: Tab[]) => void
 }
-
+interface IMyObject {
+  value: string;
+  display:string;
+  example:string;
+}
 export interface State {
   endpoint: string
   subscriptionPrefix?: string
@@ -87,7 +92,9 @@ export interface State {
   activeEnv?: string
   headers?: any
   schema?: GraphQLSchema
+  arr: IMyObject[]
 }
+
 
 class PlaygroundWrapper extends React.Component<
   PlaygroundWrapperProps & ReduxProps,
@@ -99,6 +106,7 @@ class PlaygroundWrapper extends React.Component<
     ;(global as any).m = this
 
     this.state = this.mapPropsToState(props)
+   /* this.state = { endpoint: props.endpoint,arr: []} */
     this.removeLoader()
   }
 
@@ -144,6 +152,7 @@ class PlaygroundWrapper extends React.Component<
       activeEnv,
       activeProjectName: projectName,
       headers,
+      arr:[]
     }
   }
 
@@ -265,6 +274,20 @@ class PlaygroundWrapper extends React.Component<
   }
 
   componentDidMount() {
+    fetch("http://localhost:3000/apilist")
+    .then((response) => {
+      return response.json();
+    })
+    .then(data => {
+      let apisFromDb = data.map(api => {
+        return { value: api.endpoint, display: api.name,example:api.example }
+      });
+      this.setState({
+        arr: apisFromDb
+      });
+    }).catch(error => {
+      console.log(error);
+    });
     if (this.state.subscriptionEndpoint === '') {
       this.updateSubscriptionsUrl()
     }
@@ -332,7 +355,7 @@ class PlaygroundWrapper extends React.Component<
       root.classList.remove('playgroundIn')
     }
   }
-
+    
   render() {
     const title = this.props.setTitle ? (
       <Helmet>
@@ -345,8 +368,16 @@ class PlaygroundWrapper extends React.Component<
     const combinedHeaders = { ...defaultHeaders, ...stateHeaders }
 
     const { theme } = this.props
+    
     return (
       <div>
+          <select id="mySelect1" onChange={this.handleChangeEndpoint}
+           autoFocus={true} 
+           style={{marginLeft:"400px", marginBottom:"20px", marginTop:"20px", position:"fixed",zIndex:101}}
+ >
+        {this.state.arr.map((api) => <option key={api.value} value={api.value}>{api.display}</option>)}
+              </select>
+              <Autocomplete options={["rApi","mAPI","zApi"] }/> 
         {title}
         <ThemeProvider
           theme={{
@@ -376,6 +407,7 @@ class PlaygroundWrapper extends React.Component<
                   configPath={this.props.configPath}
                 />
               )}
+           
             <Playground
               endpoint={this.state.endpoint}
               shareEnabled={this.props.shareEnabled}
@@ -450,8 +482,15 @@ class PlaygroundWrapper extends React.Component<
     })
   }
 
-  private handleChangeEndpoint = endpoint => {
-    this.setState({ endpoint })
+  private handleChangeEndpoint = e => {
+    this.setState({ endpoint: e.target.value })
+    this.state.arr.map((obj) => {
+      if (obj.value==e.target.value) {
+        localStorage.setItem("example",obj.example);
+        return;
+      }
+    })
+
   }
 
   private handleChangeSubscriptionsEndpoint = subscriptionEndpoint => {
