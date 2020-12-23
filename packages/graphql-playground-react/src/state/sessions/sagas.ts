@@ -38,7 +38,6 @@ import { Session } from './reducers'
 import { safely, prettify } from '../../utils'
 import * as queryString from 'query-string'
 import { parseHeaders } from '../../components/Playground/util/parseHeaders'
-
 function* setQueryFacts() {
   // debounce by 100 ms
   yield delay(100)
@@ -47,7 +46,6 @@ function* setQueryFacts() {
   try {
     const ast = parse(session.query)
     const queryFacts = getQueryFacts(schema, ast)
-
     if (queryFacts) {
       const immutableQueryFacts = fromJS(queryFacts)
       const operationName = getSelectedOperationName(
@@ -69,7 +67,6 @@ function* setQueryFacts() {
         yield put(setOperationName(operationName))
       }
     }
-
     const queryTypes = getQueryTypes(ast)
     yield put(setQueryTypes(queryTypes))
   } catch (e) {
@@ -77,14 +74,12 @@ function* setQueryFacts() {
     yield put(setQueryTypes(queryTypes))
   }
 }
-
 function* reflectQueryToUrl({ payload }) {
   // debounce by 100 ms
   yield delay(100)
   if (!location.search.includes('query')) {
     return
   }
-
   const params = queryString.parse(location.search)
   if (typeof params.query !== 'undefined') {
     const newSearch = queryString.stringify({
@@ -99,7 +94,6 @@ function* reflectQueryToUrl({ payload }) {
     )
   }
 }
-
 function* runQueryAtPosition(action) {
   const { position } = action.payload
   const session: Session = yield select(getSelectedSession)
@@ -124,7 +118,6 @@ function* runQueryAtPosition(action) {
     yield put(runQuery())
   }
 }
-
 function* getSessionWithCredentials() {
   const session = yield select(getSelectedSession)
   const settings = yield select(getSettings)
@@ -132,14 +125,12 @@ function* getSessionWithCredentials() {
     ...settings['request.globalHeaders'],
     ...parseHeaders(session.headers),
   }
-
   return {
     endpoint: session.endpoint,
     headers: JSON.stringify(combinedHeaders),
     credentials: settings['request.credentials'],
   }
 }
-
 function* fetchSchemaSaga() {
   const session: Session = yield getSessionWithCredentials()
   try {
@@ -157,7 +148,6 @@ function* fetchSchemaSaga() {
     yield put(fetchSchema())
   }
 }
-
 function* refetchSchemaSaga() {
   const session: Session = yield getSessionWithCredentials()
   try {
@@ -175,9 +165,7 @@ function* refetchSchemaSaga() {
     yield put(refetchSchema())
   }
 }
-
 let lastSchema
-
 function* renewStacks() {
   const session: Session = yield select(getSelectedSession)
   const fetchSession = yield getSessionWithCredentials()
@@ -194,20 +182,16 @@ function* renewStacks() {
     lastSchema = schema
   }
 }
-
 function* addToHistory({ payload }) {
   const { sessionId } = payload
   const workspace = yield select(getSelectedWorkspace)
   const session = workspace.getIn(['sessions', sessionId])
-
   const history: HistoryState = workspace.get('history')
-
   const exists = history.toKeyedSeq().find(item => is(item, session))
   if (!exists) {
     yield put(addHistoryItem(session))
   }
 }
-
 function* prettifyQuery() {
   const { query } = yield select(getSelectedSession)
   const settings = yield select(getSettings)
@@ -224,7 +208,9 @@ function* prettifyQuery() {
     console.log(e)
   }
 }
-
+function* displayQuery() {
+  yield put(editQuery("#Example Query\n"+localStorage.getItem("example")));
+}
 export const sessionsSagas = [
   takeLatest('GET_QUERY_FACTS', safely(setQueryFacts)),
   takeLatest('SET_OPERATION_NAME', safely(setQueryFacts)),
@@ -236,7 +222,7 @@ export const sessionsSagas = [
   takeLatest('SCHEMA_FETCHING_SUCCESS', safely(renewStacks)),
   takeEvery('QUERY_SUCCESS' as any, safely(addToHistory)),
   takeLatest('PRETTIFY_QUERY', safely(prettifyQuery)),
+  takeLatest('DISPLAY_QUERY', safely(displayQuery)),
 ]
-
 // needed to fix typescript
 export { ForkEffect }

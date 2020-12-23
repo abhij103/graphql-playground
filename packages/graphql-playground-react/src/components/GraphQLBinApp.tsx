@@ -110,7 +110,7 @@ class GraphQLBinApp extends React.Component<Props & ReduxProps, State> {
   }
 
   render() {
-    localStorage.setItem("example","query{<br/>GetUser(userId: 5){<br/>name<br/>email<br/>id<br/>}<br/>}");
+    localStorage.setItem("example","query{\nGetUser(userId: 5){\nname\nemail\nid\n}\n}");
     let { endpoint, subscriptionEndpoint } = this.state
     // If no  endpoint passed tries to get one from url
     if (!endpoint) {

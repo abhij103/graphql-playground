@@ -468,11 +468,13 @@ const GraphiqlsContainer = styled.div`
   height: calc(100vh - 57px);
   position: relative;
   overflow: hidden;
+  background-color:white
 `
 
 const GraphiqlWrapper = styled.div`
-  width: 100%;
-  height: 100%;
+  width: 80%;
+  height: 95%;
+  margin-left:120px;
   position: relative;
   overflow: hidden;
   visibility: hidden;

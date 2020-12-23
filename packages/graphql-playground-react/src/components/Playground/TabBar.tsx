@@ -101,6 +101,8 @@ export default connect(
 const StyledTabBar = styled.div`
   color: white;
   height: 57px;
+  width:80%;
+  margin-left:120px;
   background: ${p => p.theme.editorColours.background};
   overflow: hidden;
   -webkit-app-region: drag;

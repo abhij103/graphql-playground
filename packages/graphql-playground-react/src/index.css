@@ -2,11 +2,13 @@ body {
   margin: 0;
   padding: 0;
   font-family: sans-serif;
-  overflow: hidden;
+  overflow: auto;
+  background-color: white;
 }
 
 #root {
   height: 100%;
+  background-color: white;
 }
 
 body {
@@ -40,4 +42,58 @@ input, button, pre {
 
 code {
   font-family: Consolas, monospace;
+}
+.search {
+  margin-left:130px;
+  margin-top:-25px;
+  text-align: right; 
+  position: relative;
+  width: 150px;
+}
+.search-box {
+  border: 2px solid black;
+  border-radius: 1px;
+  font-size: 0.9rem;
+  width: 150px;
+}
+.search-box:focus {
+  width: 100%;
+  outline: none;
+  border: 2px solid #03a1fc;
+}
+
+ul.options {
+  display: block;
+  list-style: none;
+  width: 150px;
+  transition: width 0.3s;
+  margin: auto;
+  margin-left:130px;
+  position: relative;
+}
+
+ul.options li {
+  display: block;
+  background: white;
+  margin: 2px auto;
+  padding: 2px;
+  font-size: 0.8rem;
+  width: 150px;
+  border-radius: 2px;
+}
+ul.options li:hover {
+  font-weight: bold;
+  color:#03a1fc;
+  cursor: pointer;
+  transition: 0.3s all;
+}
+
+ul.options li.option-active {
+  background: whitesmoke;
+  font-size: 0.9rem;
+  color: #03a1fc;
+}
+.no-options {
+  margin-left:150px;
+  color:black;
 }

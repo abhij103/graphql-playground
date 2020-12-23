@@ -40,7 +40,7 @@ const Wrapper = styled.div`
 const IconWrapper = styled.div`
   position: relative;
   cursor: pointer;
-
+margin-right:125px;
   svg {
     fill: ${p => p.theme.editorColours.icon};
     transition: 0.1s linear fill;

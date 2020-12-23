@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { styled } from '../../../styled/index'
 import * as copy from 'copy-to-clipboard'
-
 import Share from '../../Share'
 import SchemaReload from './SchemaReload'
 import { createStructuredSelector } from 'reselect'
@@ -18,13 +17,13 @@ import {
   editEndpoint,
   prettifyQuery,
   refetchSchema,
+  displayQuery,
 } from '../../../state/sessions/actions'
 import { share } from '../../../state/sharing/actions'
 import { openHistory } from '../../../state/general/actions'
 import { getSettings } from '../../../state/workspace/reducers'
 import { Session } from '../../../state/sessions/reducers'
 import { ISettings } from '../../../types'
-
 export interface Props {
   endpoint: string
   shareEnabled?: boolean
@@ -32,16 +31,14 @@ export interface Props {
   isPollingSchema: boolean
   endpointUnreachable: boolean
   session: Session
-
   editEndpoint: (value: string) => void
   prettifyQuery: () => void
+  displayQuery: ()=>void
   openHistory: () => void
   share: () => void
   refetchSchema: () => void
-
   settings: ISettings
 }
-
 class TopBar extends React.Component<Props, {}> {
   static contextTypes = {
     store: PropTypes.shape({
@@ -56,6 +53,7 @@ class TopBar extends React.Component<Props, {}> {
       <TopBarWrapper>
         <Button onClick={this.props.prettifyQuery}>Prettify</Button>
         <Button onClick={this.openHistory}>History</Button>
+        <Button onClick={this.props.displayQuery}>Example Query</Button>
         <UrlBarWrapper>
           <UrlBar
             value={this.props.endpoint}
@@ -153,7 +151,6 @@ class TopBar extends React.Component<Props, {}> {
     }' ${headersString} --data-binary '${data}' --compressed`
   }
 }
-
 const mapStateToProps = createStructuredSelector({
   endpoint: getEndpoint,
   fixedEndpoint: getFixedEndpoint,
@@ -162,18 +159,17 @@ const mapStateToProps = createStructuredSelector({
   settings: getSettings,
   session: getSelectedSession,
 })
-
 export default connect(
   mapStateToProps,
   {
     editEndpoint,
     prettifyQuery,
+    displayQuery,
     openHistory,
     share,
     refetchSchema,
   },
 )(TopBar)
-
 export const Button = styled.button`
   text-transform: uppercase;
   font-weight: 600;
@@ -185,28 +181,24 @@ export const Button = styled.button`
   font-size: 14px;
   padding: 6px 9px 7px 10px;
   margin-left: 6px;
-
   cursor: pointer;
   transition: 0.1s linear background-color;
   &:first-child {
     margin-left: 0;
   }
   &:hover {
-    background-color: ${p => p.theme.editorColours.buttonHover};
+    background-color: green;
   }
 `
-
 const TopBarWrapper = styled.div`
   display: flex;
   background: ${p => p.theme.editorColours.navigationBar};
   padding: 10px 10px 4px;
   align-items: center;
 `
-
 interface UrlBarProps {
   active: boolean
 }
-
 const UrlBar = styled<UrlBarProps, 'input'>('input')`
   background: ${p => p.theme.editorColours.button};
   border-radius: 4px;
@@ -220,7 +212,6 @@ const UrlBar = styled<UrlBarProps, 'input'>('input')`
   font-size: 13px;
   flex: 1;
 `
-
 const UrlBarWrapper = styled.div`
   flex: 1;
   margin-left: 6px;
@@ -228,27 +219,23 @@ const UrlBarWrapper = styled.div`
   display: flex;
   align-items: center;
 `
-
 const ReachError = styled.div`
   position: absolute;
   right: 5px;
   display: flex;
   align-items: center;
-  color: #f25c54;
+  color: #F25C54;
 `
-
 const Pulse = styled.div`
   width: 16px;
   height: 16px;
   background-color: ${p => p.theme.editorColours.icon};
   border-radius: 100%;
 `
-
 const SpinnerWrapper = styled.div`
   position: relative;
   margin: 6px;
 `
-
 const Spinner = () => (
   <SpinnerWrapper>
     <Pulse />

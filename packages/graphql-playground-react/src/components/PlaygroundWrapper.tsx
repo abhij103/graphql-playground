@@ -26,6 +26,7 @@ import { getTheme, getSettings } from '../state/workspace/reducers'
 import { Session, Tab } from '../state/sessions/reducers'
 import { ApolloLink } from 'apollo-link'
 import { injectTabs } from '../state/workspace/actions'
+import {displayQuery} from '../state/sessions/actions'
 import { buildSchema, buildClientSchema, GraphQLSchema } from 'graphql'
 
 function getParameterByName(name: string, uri?: string): string | null {
@@ -55,6 +56,7 @@ export interface PlaygroundWrapperProps {
   onSaveConfig?: (configString: string) => void
   onNewWorkspace?: () => void
   getRef?: (ref: any) => void
+  displayQuery: ()=>void
   platformToken?: string
   env?: any
   config?: GraphQLConfig
@@ -93,6 +95,8 @@ export interface State {
   headers?: any
   schema?: GraphQLSchema
   arr: IMyObject[]
+  tcolor:string
+  apinames:string[]
 }
 
 
@@ -152,7 +156,9 @@ class PlaygroundWrapper extends React.Component<
       activeEnv,
       activeProjectName: projectName,
       headers,
-      arr:[]
+      arr:[],
+      tcolor:"dark",
+      apinames:[]
     }
   }
 
@@ -274,16 +280,21 @@ class PlaygroundWrapper extends React.Component<
   }
 
   componentDidMount() {
-    fetch("http://localhost:3000/apilist")
+    fetch("https://eu-west-1.integration.cloud.tibcoapps.com/cqu4yxe3dndygjfts3ov7ivhttoysfzw/getendpoints")
     .then((response) => {
       return response.json();
     })
     .then(data => {
-      let apisFromDb = data.map(api => {
+      let apisFromDb = data.apilist.map(api => {
         return { value: api.endpoint, display: api.name,example:api.example }
       });
+      let apnames = data.apilist.map(api => {
+        return api.name
+      });
       this.setState({
-        arr: apisFromDb
+        arr: apisFromDb,
+        apinames:apnames
+        
       });
     }).catch(error => {
       console.log(error);
@@ -371,13 +382,24 @@ class PlaygroundWrapper extends React.Component<
     
     return (
       <div>
-          <select id="mySelect1" onChange={this.handleChangeEndpoint}
+        <h2 style={{color:"#03a1fc",textAlign:"center"}}><b>TIBCO's GraphQL API's</b></h2>
+        <div style={{height:"50px",marginLeft:"50px", marginBottom:"20px", marginTop:"20px",zIndex:101}} >
+       <div style={{marginLeft:"5px",float:"left",width:"300px",height:"45px"}}> <p>Search API 🔍:</p>
+       <Autocomplete options={this.state.apinames} parentCallback={this.handleCallback}/> 
+         </div>
+        <label htmlFor="mySelect1">Choose an API:</label>&nbsp;&nbsp;
+          <select id="mySelect1" value={this.state.endpoint} onChange={this.handleChangeEndpoint}
            autoFocus={true} 
-           style={{marginLeft:"400px", marginBottom:"20px", marginTop:"20px", position:"fixed",zIndex:101}}
  >
         {this.state.arr.map((api) => <option key={api.value} value={api.value}>{api.display}</option>)}
-              </select>
-              <Autocomplete options={["rApi","mAPI","zApi"] }/> 
+              </select>&nbsp;&nbsp;
+
+              <label htmlFor="mySelect2">Theme:</label>&nbsp;&nbsp;
+        <select id="mySelect2" onChange={this.colourChange}>
+          <option value="dark">DARK</option>
+          <option value="light">LIGHT</option>
+        </select>
+              </div><hr/>
         {title}
         <ThemeProvider
           theme={{
@@ -385,7 +407,7 @@ class PlaygroundWrapper extends React.Component<
             mode: theme,
             colours: theme === 'dark' ? darkColours : lightColours,
             editorColours: {
-              ...(theme === 'dark' ? darkEditorColours : lightEditorColours),
+              ...(theme === this.state.tcolor ? darkEditorColours : lightEditorColours),
               ...this.props.codeTheme,
             },
             settings: this.props.settings,
@@ -481,7 +503,9 @@ class PlaygroundWrapper extends React.Component<
       activeProjectName: projectName,
     })
   }
-
+  colourChange = (e) => {
+    this.setState({ tcolor: e.target.value })
+  }
   private handleChangeEndpoint = e => {
     this.setState({ endpoint: e.target.value })
     this.state.arr.map((obj) => {
@@ -490,9 +514,24 @@ class PlaygroundWrapper extends React.Component<
         return;
       }
     })
-
+    const vm = this;
+    setTimeout(function () {
+      vm.props.displayQuery();
+    },100)
+    
   }
-
+  handleCallback = (cd) => {
+    this.state.arr.map((obj) => {
+      if (obj.display == cd) {
+        this.setState({
+          endpoint:obj.value
+        })
+        localStorage.setItem("example",obj.example);
+        return;
+      }
+    })
+  }
+  
   private handleChangeSubscriptionsEndpoint = subscriptionEndpoint => {
     this.setState({ subscriptionEndpoint })
   }
@@ -574,7 +613,7 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(
   mapStateToProps,
-  { injectTabs },
+  { injectTabs,displayQuery,},
 )(PlaygroundWrapper)
 
 async function find(

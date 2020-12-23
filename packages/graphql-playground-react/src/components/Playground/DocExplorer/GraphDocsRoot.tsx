@@ -10,10 +10,12 @@ export interface Props {
 }
 
 export default class GraphDocsRoot extends React.PureComponent<Props, {}> {
+
   render() {
     const { schema, sessionId } = this.props
     const obj = serializeRoot(schema)
     return (
+      <div>
       <DocsRoot className="doc-root">
         <ShowRootType
           name="Queries"
@@ -38,6 +40,7 @@ export default class GraphDocsRoot extends React.PureComponent<Props, {}> {
           />
         )}
       </DocsRoot>
+     </div>
     )
   }
 }

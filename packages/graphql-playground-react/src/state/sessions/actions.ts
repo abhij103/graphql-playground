@@ -1,5 +1,4 @@
 import { createActions } from 'redux-actions'
-
 export const {
   editQuery,
   editVariables,
@@ -30,6 +29,7 @@ export const {
   renewStacks,
   runQuery,
   prettifyQuery,
+  displayQuery,
   fetchSchema,
   updateQueryFacts,
   runQueryAtPosition,
@@ -75,7 +75,6 @@ export const {
   SET_OPERATIONS: simpleAction('operations'),
   SET_EDITOR_FLEX: simpleAction('editorFlex'),
   EDIT_NAME: simpleAction('name'),
-
   OPEN_QUERY_VARIABLES: () => ({ queryVariablesActive: true }),
   CLOSE_QUERY_VARIABLES: () => ({ queryVariablesActive: false }),
   SET_VARIABLE_EDITOR_HEIGHT: simpleAction('variableEditorHeight'),
@@ -86,11 +85,10 @@ export const {
   SET_RESPONSE_EXTENSIONS: simpleAction('responseExtensions'),
   SET_CURRENT_QUERY_START_TIME: simpleAction('currentQueryStartTime'),
   SET_CURRENT_QUERY_END_TIME: simpleAction('currentQueryEndTime'),
-
   UPDATE_QUERY_FACTS: simpleAction(),
   PRETTIFY_QUERY: simpleAction(),
+  DISPLAY_QUERY:simpleAction(),
   INJECT_HEADERS: (headers, endpoint) => ({ headers, endpoint }),
-
   // setting multiple props
   /*
     this.setState({
@@ -111,7 +109,6 @@ export const {
   CLOSE_VARIABLES: simpleAction('variableEditorHeight'),
   OPEN_VARIABLES: simpleAction('variableEditorHeight'),
   TOGGLE_VARIABLES: simpleAction(),
-
   /*
     a littlebit more complex state mutations
   */
@@ -126,7 +123,6 @@ export const {
     response,
   }),
   CLEAR_RESPONSES: simpleAction(),
-
   FETCH_SCHEMA: simpleAction(),
   REFETCH_SCHEMA: simpleAction(),
   SET_ENDPOINT_UNREACHABLE: simpleAction('endpoint'),
@@ -146,18 +142,15 @@ export const {
   */
   SCHEMA_FETCHING_ERROR: (endpoint, error) => ({ endpoint, error }),
   /*
-
       this.setState({
         isReloadingSchema: false,
         endpointUnreachable: true,
       })
   */
-
   RENEW_STACKS: simpleAction(),
   /*
   GraphQLEditor.renewStacks()
   */
-
   RUN_QUERY: operationName => ({ operationName }),
   QUERY_SUCCESS: simpleAction(),
   QUERY_ERROR: simpleAction(),
@@ -182,7 +175,6 @@ export const {
   SELECT_TAB_INDEX: simpleAction('index'),
   CLOSE_TAB: simpleAction('sessionId'),
   REORDER_TABS: (src, dest) => ({ src, dest }),
-
   // files, settings, config
   EDIT_SETTINGS: simpleAction(),
   SAVE_SETTINGS: simpleAction(),
@@ -191,7 +183,11 @@ export const {
   EDIT_FILE: simpleAction(),
   SAVE_FILE: simpleAction(),
 })
-
 function simpleAction(key?: any, defaultValue?: any) {
   return value => ({ [key]: value || defaultValue })
 }
+
+
+
+
+

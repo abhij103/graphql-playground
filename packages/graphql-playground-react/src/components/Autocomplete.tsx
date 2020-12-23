@@ -1,7 +1,7 @@
 import * as React from 'react';
-/*import PropTypes from 'prop-types';*/
 export interface Props {
   options: string[]
+  parentCallback(cd:string):any
 }
 
 export interface State {
@@ -10,10 +10,7 @@ export interface State {
   showOptions:boolean
   userInput:string
 }
-export class Autocomplete extends React.Component<Props & State>{
-/*  static propTypes = {
-    options: PropTypes.instanceOf(Array).isRequired
-  }; */
+export class Autocomplete extends React.Component<Props , State>{
   state = {
     activeOption: 0,
     filteredOptions: [],
@@ -21,9 +18,6 @@ export class Autocomplete extends React.Component<Props & State>{
     userInput: ''
   };
   onChange = (e) => {
-    console.log('onChanges');
-
-   /* const { options } = this.props.options; */
     const userInput = e.currentTarget.value;
 
     const filteredOptions = this.props.options.filter(
@@ -47,12 +41,12 @@ export class Autocomplete extends React.Component<Props & State>{
       showOptions: false,
      
     });
-   /* const vm = this;
+   const vm = this;
         setTimeout(function () {
             vm.props.parentCallback(vm.state.userInput);
           //  document.getElementById("sbar").value=""
           //e.preventDefault();
-        },100) */
+        },100) 
         
   };
   onKeyDown = (e) => {
@@ -64,12 +58,12 @@ export class Autocomplete extends React.Component<Props & State>{
         showOptions: false,
         userInput: filteredOptions[activeOption]
       });
-   /*   const vm = this;
+      const vm = this;
       setTimeout(function () {
           vm.props.parentCallback(vm.state.userInput);
         //  document.getElementById("sbar").value=""
         //e.preventDefault();
-      },100) */
+      },100) 
 
     } else if (e.keyCode === 38) {
       if (activeOption === 0) {
@@ -131,8 +125,9 @@ export class Autocomplete extends React.Component<Props & State>{
             onKeyDown={onKeyDown}
             value={userInput}
             placeholder="enter api name"
+            autoComplete="off"
           />
-        </div><br/><br/>
+        </div>
         {optionList}
       </React.Fragment>
     );
